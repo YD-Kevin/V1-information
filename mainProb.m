@@ -1,13 +1,26 @@
- lambda=5;
- sigma=5;
- n=128;
- time=40;
+%% Biological Factors
+% macaque
+rf=1; %receptive field size by degree 
+nd=3000; %2-D neural density in V1 by cell/mm^2 (Jaeson Jang, Min Song, Se-Bum Paik, 2020)
+mf=2; %cortical magnification factor degree/mm (Roger B. H. Tootell et.al., 1988)
+lcScale=0.55; %a reference scale factor of lateral connection by mm 
+
+%% Parameters
+
+n=256; %256*256 cells, number of cells in this patch of V1 cortex
+m=512; %image input is 256*256 unit pixels
+nDist=sqrt(1/nd); %(sqrt(n^2/nd)/n), convert the unit distence between cells to mm
+vWindow=n*nDist*mf; %the corespondent vision range of this patch by degree 
+rfRad=round((m/vWindow)*rf/2); %the radius of receptive field by unit pixels
+simFreq=40; %
+lcSigma=lcScale/nDist;
+lcRad=round(lcSigma*1.8);
 
 %% 
-% mapAlbum=zeros(10,lambda*8+n,lambda*8+n);
+% mapAlbum=zeros(10,lcRad*2+n,lcRad*2+n);
 % 
 % for a=1:1:10
-%     mapAlbum(a,:,:)=buildMap(3/a-0.29,lambda*8+n);
+%     mapAlbum(a,:,:)=buildMap(3/a-0.29,lcRad*2+n);
 % end
 % 
 % actAlbum=zeros(10,40,n,n);
@@ -15,14 +28,18 @@
 % 
 % inputImg = double(imread('cameraman.tif'));%图片输入
 % actAlbum=zeros(10,time,n,n);
-read1=read;
-readCount1=readCount;
 
-map=squeeze(mapAlbum(5,:,:));
+% map=buildMap(0.2,lcRad*2+n);
 
-IList=input(lambda,n,time,inputImg,map);
+% album=buildAlbum(lcRad,n,lcSigma,map,a);
 
-[read,readCount]=evo(lambda,n,time,album,IList,a);
+
+
+
+% img=buildRaster(0,0,15,m);
+% IList=input(rfRad,lcRad,n,m,simFreq,img,map);
+
+
 
 % for a=1:1:10
 %     map=squeeze(mapAlbum(a,:,:)); %生成偏好图
@@ -36,58 +53,59 @@ IList=input(lambda,n,time,inputImg,map);
 
 %% 建立互相关场图册
 
-function album=buildAlbum(lambda,n,sigma,map,a)
+function album=buildAlbum(lcRad,n,lcSigma,map,a)
 
-    album=zeros(n,n,lambda*8+n,lambda*8+n); 
-    subMap=zeros(lambda*8+1);
+    album=zeros(n,n,lcRad*2+1,lcRad*2+1); 
+    subMap=zeros(lcRad*2+1);
     
     %根据偏好图绘制各个神经元对周边神经元的作用分布图
     for x=1:1:n
         for y=1:1:n
     
-            subMap=map(x:x+lambda*8,y:y+lambda*8);
-            subMap=buildCoProfile(lambda,sigma,subMap);
+            subMap=map(x:x+lcRad*2,y:y+lcRad*2);
+            subMap=buildLCProfile(lcRad,lcSigma,subMap);
+
     
-            chart=zeros(lambda*8+n);
-            chart(x:x+lambda*8,y:y+lambda*8)=subMap;
-    
-            album(x,y,:,:)=chart;
-            count=((a-1)*168+x)/1680
+            album(x,y,:,:)=subMap;
+            
         end
+        count=x/n
     end
 
 end
 
 %% 计算前馈刺激
- 
- function IList=input(lambda,n,time,inputImg,map)
+
+ function IList=input(rfRad,lcRad,n,m,simFreq,inputImg,map)
 % [X, Y]=meshgrid(1:256);
 % SX=sin(X/2)*100;
 % SY=sin(Y/2)*100;
 % 
 %  temImg=ones(256)*30;
 %   I=buildInput(SY,map,lambda,n);
+    
 
     randseed=randn(n);
     randseed=randseed./abs(randseed);
-    
-    imgList=zeros(time,256,256);
-    
-    randIndex=sum(abs(inputImg),'all')/(256*256*5);
-    
-    
-    for i=1:1:time
-        imgList(i,:,:)=inputImg+randIndex*randn(256);
+
+    imgList=zeros(simFreq,m,m);
+
+    randIndex=mean(abs(inputImg),'all')/5;
+
+
+    for i=1:1:simFreq
+        imgList(i,:,:)=inputImg+randIndex*randn(m);
     end
-    
-    
-    
+
+
+
     %根据图片输入，绘制前馈刺激
-    IList=10*ones(time,n,n);
-    for i=1:1:time
-        IList(i,:,:)=(buildInput(squeeze(imgList(i,:,:)),map,lambda,n).*randseed)/30;
+    IList=zeros(simFreq,n,n);
+    for i=1:1:simFreq
+        IList(i,:,:)=(buildInput(squeeze(imgList(i,:,:)),map,rfRad,lcRad,n).*randseed)/30;
+        i=i
     end
-    
+
      % I=buildInput(inputImg,map,lambda,n);
      % I=I.*randseed;
 
@@ -101,13 +119,12 @@ function [act,actCount]=evo(lambda,n,time,album,IList,a)
  actCount=zeros(n,n);
  act(1,:,:)=rand(n);
  for t=2:1:time
-     tem=squeeze(act(t-1,:,:));
-     musk=poissrnd(tem/time);
-     actCount=actCount+musk;
-
+     prevAct=squeeze(act(t-1,:,:));
+     actualSpk=poissrnd(prevAct/time);
+     actCount=actCount+actualSpk;
      bingo=squeeze(sum(album .* (musk*time), [1 2]));
-     bingo=bingo(4*lambda+1:4*lambda+n,4*lambda+1:4*lambda+n);
-     act(t,:,:)=relu(-0.6*tem+bingo+squeeze(IList(t,:,:)));
+     bingo=bingo(lcRad+1:lcRad+n,lcRad+1:lcRad+n);
+     act(t,:,:)=relu(-0.6*prevAct+bingo+squeeze(IList(t,:,:)));
      count=((a-1)*168+128+t)/1680
  end
 end
@@ -116,9 +133,9 @@ function pos=relu(rate)
     pos=(abs(rate)+rate)/2;
 end
 
-function cs=buildRaster(theta,posX)
+function cs=buildRaster(theta,posX,wid,m)
 theta_rad = deg2rad(theta);
-[H,S] = meshgrid(1:256,1:256);
+[H,S] = meshgrid(1:m,1:m);
 h_theta =  H * cos(theta_rad) + S * sin(theta_rad);
-cs=cos(2*pi*h_theta/8+posX);
+cs=cos(2*pi*h_theta/(wid*2)+posX);
 end
