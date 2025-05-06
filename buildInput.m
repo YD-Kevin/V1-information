@@ -26,6 +26,5 @@ for x=1:1:n
         neighbor=paddedImg(x*2:x*2+2*rfRad,y*2:y*2+2*rfRad);
         I(x,y)=sum(neighbor.* squeeze(rfAlbum(x,y,:,:)),'all');
     end
-    x=x
 end
 
