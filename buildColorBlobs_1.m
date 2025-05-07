@@ -1,6 +1,7 @@
-function blobs=buildColorBlobs_1(map,rho,threshold,majorAxis,minorAxis,noiseLevel)
+function blobs=buildColorBlobs_1(rho,lcRad,n,threshold,majorAxis,minorAxis,noiseLevel)
 
-
+map=buildMap(rho,lcRad*2+n,0,0);
+shiftedMap=buildMap(rho,lcRad*2+n,0.5,0.5);
 Fx=cos(map*2-pi);
 Fy=sin(map*2-pi);
 
@@ -37,7 +38,7 @@ for i=1:length(xCoords)
     finalMask=finalMask | mask;
 end
 
-shiftedMap=buildMap(rho,lcRad*2+n,0.5,0.5);
+
 blobs=shiftedMap .* finalMask;
 
 end
