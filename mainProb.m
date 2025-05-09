@@ -17,40 +17,60 @@ lcSigma=lcScale/nDist;
 lcRad=round(lcSigma*1.8);
 a=1;
 
+candidateFuncs = {
+    @(x) x,             % T1(x)=x
+    @(x) x.^2,          % T2(x)=x^2
+    @(x) x.^3,            % T3(x)=x^3
+    @(x) log(abs(x)+1e-3), % T4(x)=log(|x|)
+    @(x) abs(x)         % T5(x)=|x|
+};
+maxk=5;
 
-%% Test
- % map=buildMap(0.2,lcRad*2+n);
- % 
- % album=buildAlbum(lcRad,n,lcSigma,map,a);
+
+
+%% 
+%  mapAlbum=zeros(10,lcRad*2+n,lcRad*2+n);
+% % 
+%  for a=1:1:10
+%      mapAlbum(a,:,:)=buildMap(3/a-0.29,lcRad*2+n);
+%  end
+% 
+
+
+% 
+% 
+
+ %  map=buildMap(0.2,lcRad*2+n);
+
+ %  album=buildAlbum(lcRad,n,lcSigma,map,a);
  % 
  % img=buildRaster(0,0,15,m);
  % 
  % IList=input(rfRad,lcRad,n,m,simFreq,img,map);
- %
- % [act,Spk]=evo(lcRad,n,simFreq,album,IList,1);
+
+ [act,Spk]=evo(lcRad,n,simFreq,album,IList,1);
 
 
 
-mapAlbum=zeros(10,lcRad*2+n,lcRad*2+n);
+%  inputImg = double(imread('cameraman.tif'));%图片输入
+%  actAlbum=zeros(10,simFreq,n,n);
+%  SpkAlbum=zeros(10,simFreq,n,n);
+% 
+% 
+% 
+% for a=1:1:10
+%     map=squeeze(mapAlbum(a,:,:)); %生成偏好图
+%     album=buildAlbum(lcRad,n,lcSigma,map,a);
+%     IList=input(rfRad,lcRad,n,m,simFreq,inputImg,map);
+%     [act,Spk]=evo(lcRad,n,simFreq,album,IList,a);
+%     actAlbum(a,:,:,:)=act;
+%     SpkAlbum(a,:,:,:)=Spk;
+% end
 
-for a=1:1:10
-   mapAlbum(a,:,:)=buildMap(3/a-0.29,lcRad*2+n);
-end
-% album of reference maps with different density.
 
-inputImg = double(imread('cameraman.tif'));
-actAlbum=zeros(10,simFreq,n,n);
-SpkAlbum=zeros(10,simFreq,n,n);
-
-
-for a=1:1:10
-    map=squeeze(mapAlbum(a,:,:)); 
-    album=buildAlbum(lcRad,n,lcSigma,map,a);
-    IList=input(rfRad,lcRad,n,m,simFreq,inputImg,map);
-    [act,Spk]=evo(lcRad,n,simFreq,album,IList,a);
-    actAlbum(a,:,:,:)=act;
-    SpkAlbum(a,:,:,:)=Spk;
-end
+indexSuffStats=findSuffStats(act,candidateFuncs,maxk);
+bestTFunc=candidateFuncs(indexSuffStats);
+IMatrix=computeCovMatrix(act,bestTFunc);
 
 
 
