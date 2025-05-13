@@ -1,3 +1,5 @@
+function makeGif(act,lcRad,n,map)
+
 o = 5;
   a = squeeze(mean(act));   
  b = map(lcRad+1:lcRad+n,lcRad+1:lcRad+n)*180/pi; 
@@ -21,6 +23,8 @@ xlabel('偏好角度（degree）');
 ylabel('发放率(归一化)');
 title('神经活动-偏好角度关系图');
 grid on;
+
+end
 
 
 
