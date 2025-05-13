@@ -1,0 +1,28 @@
+o = 5;
+  a = squeeze(mean(act));   
+ b = map(lcRad+1:lcRad+n,lcRad+1:lcRad+n)*180/pi; 
+
+
+unique_b = unique(b);          
+means = zeros(size(unique_b)); 
+
+
+for i = 1:length(unique_b)
+    x = unique_b(i);
+    mask = (b == x);           
+    means(i) = mean(a(mask)); 
+end
+means=means/max(abs(means));
+
+
+figure;
+plot(unique_b, means, 'bo-', 'LineWidth', 2, 'MarkerSize', 8);
+xlabel('偏好角度（degree）');
+ylabel('发放率(归一化)');
+title('神经活动-偏好角度关系图');
+grid on;
+
+
+
+xticks(unique_b);             
+set(gca, 'FontSize', 12);      
