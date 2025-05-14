@@ -55,7 +55,7 @@ maxk=5;
  end
 
 for a=1:1:10
-    map=squeeze(mapAlbum(a,:,:)); %生成偏好图
+    map=squeeze(mapAlbum(a,:,:)); 
     album=buildAlbum(lcRad,n,lcSigma,map,a);
 
 
