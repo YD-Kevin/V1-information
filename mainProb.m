@@ -1,5 +1,5 @@
-% macaque
 %% Biological Factors
+% macaque
 
 rf=1; %receptive field size by degree 
 nd=3000; %2-D neural density in V1 by cell/mm^2 (Jaeson Jang, Min Song, Se-Bum Paik, 2020)
@@ -45,52 +45,34 @@ candidateFuncs = {
 };
 maxk=5;
 
+%% Main Prob
+
+ mapAlbum=zeros(10,lcRad*2+n,lcRad*2+n);
+
+ for a=1:1:10
+     mapAlbum(a,:,:)=buildMap(1/(2^(a-4)),lcRad*2+n,0,0);
+     mapFixAlbum(a,:,:)=mapAlbum(a,lcRad+1:lcRad+n,lcRad+1:lcRad+n);
+ end
+
+for a=1:1:10
+    map=squeeze(mapAlbum(a,:,:)); %生成偏好图
+    album=buildAlbum(lcRad,n,lcSigma,map,a);
 
 
-%% 
-%  mapAlbum=zeros(10,lcRad*2+n,lcRad*2+n);
-% % 
-%  for a=1:1:10
-%      mapAlbum(a,:,:)=buildMap(3/a-0.29,lcRad*2+n);
-%  end
-% 
+    IList=input(rfRad,lcRad,n,m,simFreq,imgList,map);
 
 
-% 
-% 
-
- %  map=buildMap(0.2,lcRad*2+n);
-
- %  album=buildAlbum(lcRad,n,lcSigma,map,a);
- % 
- % img=buildRaster(0,0,15,m);
- % 
- % IList=input(rfRad,lcRad,n,m,simFreq,img,map);
-
- [act,Spk]=evo(lcRad,n,simFreq,album,IList,1);
-
-
-
-%  inputImg = double(imread('cameraman.tif'));%图片输入
-%  actAlbum=zeros(10,simFreq,n,n);
-%  SpkAlbum=zeros(10,simFreq,n,n);
-% 
-% 
-% 
-% for a=1:1:10
-%     map=squeeze(mapAlbum(a,:,:)); %生成偏好图
-%     album=buildAlbum(lcRad,n,lcSigma,map,a);
-%     IList=input(rfRad,lcRad,n,m,simFreq,inputImg,map);
-%     [act,Spk]=evo(lcRad,n,simFreq,album,IList,a);
-%     actAlbum(a,:,:,:)=act;
-%     SpkAlbum(a,:,:,:)=Spk;
-% end
-
-
-indexSuffStats=findSuffStats(act,candidateFuncs,maxk);
-bestTFunc=candidateFuncs(indexSuffStats);
-IMatrix=computeCovMatrix(act,bestTFunc);
-
+    [act,Spk]=evo(lcRad,n,simFreq,album,IList,a);
+    actAlbum(a,:,:,:)=act;
+    SpkAlbum(a,:,:,:)=Spk;
+end
+FI=zeros(1,10);
+for a=1:1:10
+    indexSuffStats=findSuffStats(suqeeze(actAlbum(a,:,:,:)),candidateFuncs,maxk);
+    bestTFunc=candidateFuncs(indexSuffStats);
+    IMatrix=computeCovMatrix(suqeeze(actAlbum(a,:,:,:)),bestTFunc);
+    FI(a)=trace(IMatrix)
+end
 
 
 %% 建立互相关场图册
