@@ -1,4 +1,4 @@
-function makeGif(act,lcRad,n,map)
+function drawTuning(act,lcRad,n,map)
 
 o = 5;
   a = squeeze(mean(act));   
