@@ -67,12 +67,17 @@ for a=1:1:10
     SpkAlbum(a,:,:,:)=Spk;
 end
 FI=zeros(1,10);
-for a=1:1:10
-    indexSuffStats=findSuffStats(suqeeze(actAlbum(a,:,:,:)),candidateFuncs,maxk);
-    bestTFunc=candidateFuncs(indexSuffStats);
-    IMatrix=computeCovMatrix(suqeeze(actAlbum(a,:,:,:)),bestTFunc);
-    FI(a)=trace(IMatrix)
+for x=1:1:n
+    for y=1:1:n
+        for a=1:1:10
+            indexSuffStats=findSuffStats(suqeeze(actAlbum(a,:,x,y)),candidateFuncs,maxk);
+            bestTFunc=candidateFuncs(indexSuffStats);
+            IMatrix=computeCovMatrix(suqeeze(actAlbum(a,:,x,y)),bestTFunc);
+            FI(a)=FI(a)+trace(IMatrix);
+        end
+    end
 end
+FI(a)=FI(a)/n^2;
 
 
 %% 建立互相关场图册
