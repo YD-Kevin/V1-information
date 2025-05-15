@@ -1,0 +1,23 @@
+function HI=computeHI(map, delta)
+
+% A function to compute the homogeneity index over the map
+
+
+
+kernelRad=ceil(3*delta); 
+[x, y]=meshgrid(-kernelRad:kernelRad, -kernelRad:kernelRad);
+kernel=exp(-(x.^2+y.^2)/(2*delta^2));
+
+
+sumG=sum(kernel(:));
+
+
+complexField=exp(2i * map);
+
+
+convResult=conv2(complexField, kernel, 'same');
+
+
+HI=abs(convResult) / sumG; 
+end
+    
