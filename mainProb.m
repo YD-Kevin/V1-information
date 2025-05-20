@@ -112,39 +112,25 @@ end
 
 %% 计算前馈刺激
 
- function IList=input(rfRad,lcRad,n,m,simFreq,inputImg,map)
-% [X, Y]=meshgrid(1:256);
-% SX=sin(X/2)*100;
-% SY=sin(Y/2)*100;
-% 
-%  temImg=ones(256)*30;
-%   I=buildInput(SY,map,lambda,n);
-    
+function IList=input(rfRad,lcRad,n,m,simFreq,imgList,map)
 
-    randseed=randn(n);
-    randseed=randseed./abs(randseed);
 
-    imgList=zeros(simFreq,m,m);
-
-    randIndex=mean(abs(inputImg),'all')/5;
+    randIndex=mean(abs(imgList),'all')/5;
 
 
     for i=1:1:simFreq
-        imgList(i,:,:)=inputImg+randIndex*randn(m);
+        imgList(i,:,:)=squeeze(imgList(i,:,:))+randIndex*randn(m);
     end
-
 
 
     %根据图片输入，绘制前馈刺激
+    rfAlbum=buildRFAlbum(map,rfRad,lcRad,n);
+
     IList=zeros(simFreq,n,n);
     for i=1:1:simFreq
-        IList(i,:,:)=(buildInput(squeeze(imgList(i,:,:)),map,rfRad,lcRad,n).*randseed)/30;
+        IList(i,:,:)=(buildInput(squeeze(imgList(i,:,:)),rfAlbum,rfRad,n));
         i=i
     end
-
-     % I=buildInput(inputImg,map,lambda,n);
-     % I=I.*randseed;
-
 end
 
 
