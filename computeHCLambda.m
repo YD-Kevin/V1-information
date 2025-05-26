@@ -1,4 +1,4 @@
-function Lambda = computeHCLambda(map,n,nDist,sigma)
+function Lambda = computeHCLambda(img,n,nDist,sigma)
 
 
 %sigma = 1.7 cycles/mm
