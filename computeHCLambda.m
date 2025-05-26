@@ -9,7 +9,7 @@ powerSpectrum = abs(fftshift(imgFFT)).^2;
 
 [M, N] = size(img);
 [KX, KY] = meshgrid(-N/2:N/2-1, -M/2:M/2-1);
-k = sqrt(KX.^2 + KY.^2) * (1/(pixelSize*n)); 
+k = sqrt(KX.^2 + KY.^2) * (1/(nDist*n)); 
 k = k(:);
 power = powerSpectrum(:);
 
