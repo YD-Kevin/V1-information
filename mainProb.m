@@ -47,10 +47,20 @@ maxk=5;
 
 %% Main Prob
 
- inputImg = double(imread('cameraman.tif'));
+
+
+
+ %inputImg = double(imread('cameraman.tif'));
+ %for i=1:simFreq
+ %        imgList(i,:,:)=inputImg;
+ %end
+
+
+
  for i=1:simFreq
-         imgList(i,:,:)=inputImg;
+    imgList(i,:,:)=200*buildRaster(0,i*1.5,9,m);
  end
+ 
  
  actAlbum=zeros(10,simFreq,n,n);
  SpkAlbum=zeros(10,simFreq,n,n);
