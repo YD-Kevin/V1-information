@@ -50,52 +50,45 @@ maxk=5;
 
 
 
- %inputImg = double(imread('cameraman.tif'));
- %for i=1:simFreq
- %        imgList(i,:,:)=inputImg;
- %end
+mapAlbum=zeros(10,lcRad*2+n,lcRad*2+n);
+ mapFixAlbum=zeros(10,n,n);
+ mapIndex=[ 0.05,  0.1 ,  0.2 ,  0.3 ,  0.4 ,  0.5 ,  0.6 ,  0.8 ,  1  ,1.5 ];
 
-
-
- for i=1:simFreq
-    imgList(i,:,:)=200*buildRaster(0,i*1.5,9,m);
- end
- 
- 
  actAlbum=zeros(10,simFreq,n,n);
  SpkAlbum=zeros(10,simFreq,n,n);
 
- mapAlbum=zeros(10,lcRad*2+n,lcRad*2+n);
-
+% % 
  for a=1:1:10
-     mapAlbum(a,:,:)=buildMap(1/(2^(a-4)),lcRad*2+n,0,0);
-     mapFixAlbum(a,:,:)=mapAlbum(a,lcRad+1:lcRad+n,lcRad+1:lcRad+n);
+     mapAlbum(a,:,:)=buildMap(mapIndex(a),lcRad*2+n,0,0);
  end
 
+
+ imgList=zeros(simFreq,m,m);
+for i=1:simFreq
+    imgList(i,:,:)=200*buildRaster(0,i*1.5,9,m);
+end
+ 
+
+
 for a=1:1:10
-    map=squeeze(mapAlbum(a,:,:)); 
+    map=squeeze(mapAlbum(a,:,:)); %生成偏好图
     album=buildAlbum(lcRad,n,lcSigma,map,a);
 
-
     IList=input(rfRad,lcRad,n,m,simFreq,imgList,map);
-
 
     [act,Spk]=evo(lcRad,n,simFreq,album,IList,a);
     actAlbum(a,:,:,:)=act;
     SpkAlbum(a,:,:,:)=Spk;
 end
-FI=zeros(1,10);
-for x=1:1:n
-    for y=1:1:n
-        for a=1:1:10
-            indexSuffStats=findSuffStats(suqeeze(actAlbum(a,:,x,y)),candidateFuncs,maxk);
-            bestTFunc=candidateFuncs(indexSuffStats);
-            IMatrix=computeCovMatrix(suqeeze(actAlbum(a,:,x,y)),bestTFunc);
-            FI(a)=FI(a)+trace(IMatrix);
-        end
-    end
+
+LFI=zeros(10,n,n);
+for a=1:10
+    act=squeeze(actAlbum(a,:,:,:));
+    map=squeeze(mapAlbum(a,:,:));
+    LFI(a,:,:)=LinearFISimple(act,map,lcRad,n);
 end
-FI(a)=FI(a)/n^2;
+plot(mean(LFI,[2,3]));
+
 
 
 %% 建立互相关场图册
