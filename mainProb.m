@@ -65,7 +65,7 @@ mapAlbum=zeros(10,lcRad*2+n,lcRad*2+n);
 
  imgList=zeros(simFreq,m,m);
 for i=1:simFreq
-    imgList(i,:,:)=200*buildRaster(0,i*1.5,9,m)+20*randn(n,n);
+    imgList(i,:,:)=200*buildRaster(0,i*1.5,9,m)+20*randn(m,m);
 end
  
 
