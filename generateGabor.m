@@ -23,5 +23,5 @@ function gabor = generateGabor(rfRad, theta)
     gabor = gaussian .* cosine;
     
     %Normalization
-    gabor = gabor / sum(gabor(),'all'); 
+    gabor = gabor / sum(abs(gabor()),'all'); 
 end
