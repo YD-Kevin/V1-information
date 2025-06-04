@@ -52,12 +52,14 @@ maxk=5;
 %% LinearFIActual
 n=64;
 m=128;
-a=10;
 t=12;
 
-mapAlbum=zeros(10,lcRad*2+n,lcRad*2+n);
-
 mapIndex=[ 0.05,  0.1 ,  0.2 ,  0.3 ,  0.4 ,  0.5 ,  0.6 ,  0.8 ,  1  ,1.5 ];
+a=size(mapIndex);
+
+mapAlbum=zeros(a,lcRad*2+n,lcRad*2+n);
+
+
 
 for i=1:1:a
     mapAlbum(i,:,:)=buildMap(mapIndex(i),lcRad*2+n,0,0);
@@ -66,7 +68,7 @@ end
 actSetTheta=zeros(a,t,simFreq,n,n);
 SpkSetTheta=zeros(a,t,simFreq,n,n);
 
-for i=1:10
+for i=1:a
     
     map=squeeze(mapAlbum(i,:,:));
     imgList=zeros(simFreq,m,m);
@@ -83,7 +85,7 @@ for i=1:10
         SpkSetTheta(i,theta+1,:,:,:)=Spk;
     end
 end
-LFIAveEachDensity=LinearFIActual(actSetTheta,10,12,n);
+LFIAveEachDensity=LinearFIActual(actSetTheta,a,t,n);
 
 
 
