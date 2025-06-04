@@ -49,46 +49,86 @@ maxk=5;
 
 
 
+%% LinearFIActual
+n=64;
+m=128;
+a=10;
+t=12;
 
 mapAlbum=zeros(10,lcRad*2+n,lcRad*2+n);
- mapFixAlbum=zeros(10,n,n);
- mapIndex=[ 0.05,  0.1 ,  0.2 ,  0.3 ,  0.4 ,  0.5 ,  0.6 ,  0.8 ,  1  ,1.5 ];
 
- actAlbum=zeros(10,simFreq,n,n);
- SpkAlbum=zeros(10,simFreq,n,n);
+mapIndex=[ 0.05,  0.1 ,  0.2 ,  0.3 ,  0.4 ,  0.5 ,  0.6 ,  0.8 ,  1  ,1.5 ];
 
-% % 
- for a=1:1:10
-     mapAlbum(a,:,:)=buildMap(mapIndex(a),lcRad*2+n,0,0);
- end
-
-
- imgList=zeros(simFreq,m,m);
-for i=1:simFreq
-    imgList(i,:,:)=200*buildRaster(0,i*1.5,9,m);
+for i=1:1:a
+    mapAlbum(i,:,:)=buildMap(mapIndex(i),lcRad*2+n,0,0);
 end
  
+actSetTheta=zeros(a,t,simFreq,n,n);
+SpkSetTheta=zeros(a,t,simFreq,n,n);
 
-
-for a=1:1:10
-    map=squeeze(mapAlbum(a,:,:)); %生成偏好图
-    album=buildAlbum(lcRad,n,lcSigma,map,a);
-
-    IList=input(rfRad,lcRad,n,m,simFreq,imgList,map);
-
-    [act,Spk]=evo(lcRad,n,simFreq,album,IList,a);
-    actAlbum(a,:,:,:)=act;
-    SpkAlbum(a,:,:,:)=Spk;
+for i=1:10
+    
+    map=squeeze(mapAlbum(i,:,:));
+    imgList=zeros(simFreq,m,m);
+    
+    album=buildAlbum(lcRad,n,lcSigma,map,i);
+    
+    for theta=0:t-1
+        for j=1:simFreq
+            imgList(j,:,:)=200*buildRaster(theta*15,j*1.5,9,m);
+        end
+        IList=input(rfRad,lcRad,n,m,simFreq,imgList,map)*10;
+        [act,Spk]=evo(lcRad,n,simFreq,album,IList,(i-1)*t+theta+1);
+        actSetTheta(i,theta+1,:,:,:)=act;
+        SpkSetTheta(i,theta+1,:,:,:)=Spk;
+    end
 end
+LFIAveEachDensity=LinearFIActual(actSetTheta,10,12,n);
 
-LFI=zeros(10,n,n);
-for a=1:10
-    act=squeeze(actAlbum(a,:,:,:));
-    map=squeeze(mapAlbum(a,:,:));
-    LFI(a,:,:)=LinearFISimple(act,map,lcRad,n);
-end
-plot(mean(LFI,[2,3]));
 
+
+
+
+
+
+%% LinearFISimple
+% mapAlbum=zeros(10,lcRad*2+n,lcRad*2+n);
+%  mapFixAlbum=zeros(10,n,n);
+%  mapIndex=[ 0.05,  0.1 ,  0.2 ,  0.3 ,  0.4 ,  0.5 ,  0.6 ,  0.8 ,  1  ,1.5 ];
+% 
+%  actAlbum=zeros(10,simFreq,n,n);
+%  SpkAlbum=zeros(10,simFreq,n,n);
+% 
+%  for a=1:1:10
+%      mapAlbum(a,:,:)=buildMap(mapIndex(a),lcRad*2+n,0,0);
+%  end
+% 
+% 
+%  imgList=zeros(simFreq,m,m);
+% for i=1:simFreq
+%     imgList(i,:,:)=200*buildRaster(0,i*1.5,9,m);
+% end
+% 
+% 
+% 
+% for a=1:1:10
+%     map=squeeze(mapAlbum(a,:,:)); %生成偏好图
+%     album=buildAlbum(lcRad,n,lcSigma,map,a);
+% 
+%     IList=input(rfRad,lcRad,n,m,simFreq,imgList,map);
+% 
+%     [act,Spk]=evo(lcRad,n,simFreq,album,IList,a);
+%     actAlbum(a,:,:,:)=act;
+%     SpkAlbum(a,:,:,:)=Spk;
+% end
+% 
+% LFI=zeros(10,n,n);
+% for a=1:10
+%     act=squeeze(actAlbum(a,:,:,:));
+%     map=squeeze(mapAlbum(a,:,:));
+%     LFI(a,:,:)=LinearFISimple(act,map,lcRad,n);
+% end
+% plot(mean(LFI,[2,3]));
 
 
 %% 建立互相关场图册
@@ -147,13 +187,6 @@ function [act,Spk]=evo(lcRad,n,simFreq,album,IList,a)
      prevAct=squeeze(act(t-1,:,:));
      actualSpk=poissrnd(prevAct/simFreq);
      Spk(t,:,:)=actualSpk;
-     % bingo=zeros(n+2*lcRad);
-     % for x=1:n
-     %     for y=1:n
-     %         bingo(x:x+2*lcRad,y:y+2*lcRad)=bingo(x:x+2*lcRad,y:y+2*lcRad)+(actualSpk(x,y)*simFreq*squeeze(album(x,y,:,:)));
-     %     end
-     %     x=x*count
-     % end
      bingo=squeeze(sum(album .* (actualSpk*simFreq), [1 2]));
      bingo=bingo(lcRad+1:lcRad+n,lcRad+1:lcRad+n);
      act(t,:,:)=relu(-0.6*prevAct+bingo+squeeze(IList(t,:,:)));
