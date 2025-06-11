@@ -3,7 +3,7 @@ function LFIAveEachDensity=LinearFIActual(actSetTheta,a,t,n)
 a=max(a,size(actSetTheta,1));
 t=max(t,size(actSetTheta,2));
 
-LFIAveEachDensity=zeros(1,a);
+LFIPerDensityTheta=zeros(a,t);
 
 for i=1:a
 
@@ -16,13 +16,18 @@ for i=1:a
     devMapL=(actMean-shiftOneL)./15;
     varSet=zeros(t,n,n);
     devMap=(devMapR+devMapL)/2;
-    LFIMap=zeros(t,n,n);
+
 
     for j=1:t
-        varMapt=squeeze(var(squeeze(actSetTheta(i,j,:,:,:))));
-        varSet(j,:,:)=varMapt;
-        devMapt=squeeze(devMap(j,:,:));
-        LFIMap(j,:,:)=(devMapt.*devMapt)./varMapt;
-        LFIAveEachDensity(i)=sum(LFIMap,'all');
+        data=squeeze(actSetTheta(i,j,:,:,:));
+        X=reshape(data, size(data,1), []);
+        covAct=cov(X); 
+        covActPInv=pinv(covAct);
+
+        devMapFlat=reshape(squeeze(devMap(j,:,:)), 1, []);
+        devMapFlatT=transpose(devMapFlat);
+        
+        LFI=devMapFlat*covActPInv*devMapFlatT;
+        LFIPerDensityTheta(i,j)=LFI;
     end
 end
