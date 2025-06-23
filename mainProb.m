@@ -2,11 +2,11 @@
 
 %macaque
 
-rf=1; %receptive field size by degree
-nd=3000; %2-D neural density in V1 by cell/mm^2 (Jaeson Jang, Min Song, Se-Bum Paik, 2020)
-mf=2; %cortical magnification factor degree/mm (Roger B. H. Tootell et.alca., 1988)
-lcScale=0.55; %a reference scale factor of lateral connection by mm
-refAct=50;
+% rf=1; %receptive field size by degree
+% nd=3000; %2-D neural density in V1 by cell/mm^2 (Jaeson Jang, Min Song, Se-Bum Paik, 2020)
+% mf=2; %cortical magnification factor degree/mm (Roger B. H. Tootell et.alca., 1988)
+% lcScale=0.55; %a reference scale factor of lateral connection by mm
+% refAct=50;
 %Cat
 
 % rf=3; %receptive field size by degree (Gilbert CD and Wiesel 1989, Fuyuki Karube and Zoltan F. Kisvarday, 2010)
@@ -23,69 +23,53 @@ refAct=50;
 %refAct=20;
 %Mouse
 
-% rf=10; %receptive field size by degree (Jiakun Fu et.al, 2024)
-% nd=2200; %2-D neural density in V1 by cell/mm^2 (Jaeson Jang, Min Song, Se-Bum Paik, 2020)
-% mf=120; %cortical magnification factor degree/mm (Jaeson Jang, Min Song, Se-Bum Paik, 2020)
-% lcScale=0.03; %a reference scale factor of lateral connection by mm (Peijia Yu et.al. 2025)
-% refAct=10;
+rf=10; %receptive field size by degree (Jiakun Fu et.al, 2024)
+nd=2200; %2-D neural density in V1 by cell/mm^2 (Jaeson Jang, Min Song, Se-Bum Paik, 2020)
+mf=120; %cortical magnification factor degree/mm (Jaeson Jang, Min Song, Se-Bum Paik, 2020)
+lcScale=0.03; %a reference scale factor of lateral connection by mm (Peijia Yu et.al. 2025)
+refAct=12;
 %% Parameters
 
-n=64; %n*n cells, number of cells in this patch of V1 cortex
-
-
-m=128; %image input is m*m unit pixels
+nCells=64; %n*n cells, number of cells in this patch of V1 cortex
+mPixels=128; %image input is m*m unit pixels
 nDist=sqrt(1/nd); %(sqrt(n^2/nd)/n), convert the unit distance between cells to mm
-visWindow=n*nDist*mf; %the correspondent vision range of this patch by degree
-rfRad=round((m/visWindow)*rf/2); %the radius of receptive field by unit pixels
+visWindow=nCells*nDist*mf; %the correspondent vision range of this patch by degree
+rfRad=round((mPixels/visWindow)*rf/2); %the radius of receptive field by unit pixels
 simFreq=6; %
 lcSigma=lcScale/nDist;
 lcRad=round(lcSigma*1.8);
-aParam=1;
-
-candidateFuncs={
-    @(x) x,    % T1(x)=x
-    @(x) x.^2,    % T2(x)=x^2
-    @(x) x.^3,    % T3(x)=x^3
-    @(x) log(abs(x)+1e-3), % T4(x)=log(|x|)
-    @(x) abs(x)    % T5(x)=|x|
-};
-
-maxk=5;
+mapIndexs=[0.05,0.1,0.2,0.3,0.4,0.5,0.6,0.8,1,1.5];
+ParamNumber=12;
+trialNumber=8;
 
 %% MainProb
 
+mapNumber=size(mapIndexs,2);
+mapAlbum=zeros(mapNumber,lcRad*2+nCells,lcRad*2+nCells);
 
-nCells=n;
-mPixels=m;
-aParam=10;
-tParam=12;
-rParam=8;
 
-mapAlbum=zeros(10,lcRad*2+nCells,lcRad*2+nCells);
-
-mapIndex=[0.05,0.1,0.2,0.3,0.4,0.5,0.6,0.8,1,1.5];
-
-for i=1:1:aParam
-    mapAlbum(i,:,:)=buildMap(mapIndex(i),lcRad*2+nCells,0,0);
+for i=1:1:mapNumber
+    mapAlbum(i,:,:)=buildMap(mapIndexs(i),lcRad*2+nCells,0,0);
 end
-actSetTheta=zeros(aParam,tParam,rParam,simFreq,nCells,nCells);
-spkSetTheta=zeros(aParam,tParam,rParam,simFreq,nCells,nCells);
 
-for i=1:aParam
+actAlbum=zeros(mapNumber,ParamNumber,trialNumber,simFreq,nCells,nCells);
+spkAlbum=zeros(mapNumber,ParamNumber,trialNumber,simFreq,nCells,nCells);
+
+for i=1:mapNumber
     map=squeeze(mapAlbum(i,:,:));
     imgList=zeros(simFreq,mPixels,mPixels);
     album=buildAlbum(lcRad,nCells,lcSigma,map,i);
     
-    for thetaVal=0:tParam-1
+    for ParamVal=1:ParamNumber
         for j=1:simFreq
-            imgList(j,:,:)=200*buildRaster(thetaVal*15,j*0.2,9,mPixels);
+            imgList(j,:,:)=buildRaster((ParamVal-1)*15,j*0.2,9,mPixels)*4*refAct;
         end
         
-        for k=1:rParam
-            IList=input(rfRad,lcRad,nCells,mPixels,simFreq,imgList,map)*refAct;
-            [act,spk]=evo(lcRad,nCells,simFreq,album,IList,(i-1)*tParam*rParam+thetaVal*rParam+k);
-            actSetTheta(i,thetaVal+1,k,:,:,:)=act;
-            spkSetTheta(i,thetaVal+1,k,:,:,:)=spk;
+        for trial=1:trialNumber
+            IList=input(rfRad,lcRad,nCells,mPixels,simFreq,imgList,map);
+            [act,spk]=evo(lcRad,nCells,simFreq,album,IList,(i-1)*ParamNumber*trialNumber+ParamVal*trialNumber+trial);
+            actAlbum(i,ParamVal,trial,:,:,:)=act;
+            spkAlbum(i,ParamVal,trial,:,:,:)=spk;
         end
     end
 end
@@ -116,9 +100,7 @@ end
 
 function IList=input(rfRad,lcRad,nCells,mPixels,simFreq,imgList,map)
 
-
 noiseLevel=mean(abs(imgList),'all')/5;
-
 
 for i=1:1:simFreq
     imgList(i,:,:)=squeeze(imgList(i,:,:))+noiseLevel*randn(mPixels);
@@ -142,7 +124,7 @@ function [act,spk]=evo(lcRad,nCells,simFreq,album,IList,aParam)
     spk=zeros(simFreq,nCells,nCells);
     for t=2:1:simFreq
         prevAct=squeeze(act(t-1,:,:));
-        actualSpk=polssrnd(prevAct/simFreq);
+        actualSpk=poissrnd(prevAct/simFreq);
         spk(t,:,:)=actualSpk;
 
 
