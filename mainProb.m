@@ -30,7 +30,7 @@ refAct=50;
 % refAct=10;
 %% Parameters
 
-n=64; %128*128 cells, number of cells in this patch of V1 cortex
+n=64; %n*n cells, number of cells in this patch of V1 cortex
 
 
 m=128; %image input is 256*256 unit pixels
@@ -55,8 +55,8 @@ maxk=5;
 %% MainProb
 
 
-nCells=64;
-mPixels=128;
+nCells=n;
+mPixels=m;
 aParam=10;
 tParam=12;
 rParam=8;
