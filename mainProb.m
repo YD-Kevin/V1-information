@@ -33,7 +33,7 @@ refAct=50;
 n=64; %n*n cells, number of cells in this patch of V1 cortex
 
 
-m=128; %image input is 256*256 unit pixels
+m=128; %image input is m*m unit pixels
 nDist=sqrt(1/nd); %(sqrt(n^2/nd)/n), convert the unit distance between cells to mm
 visWindow=n*nDist*mf; %the correspondent vision range of this patch by degree
 rfRad=round((m/visWindow)*rf/2); %the radius of receptive field by unit pixels
