@@ -9,11 +9,11 @@ lcScale=0.55; %a reference scale factor of lateral connection by mm
 refAct=50;
 %Cat
 
-rf=3; %receptive field size by degree (Gilbert CD and Wiesel 1989, Fuyuki Karube and Zoltan F. Kisvarday, 2010)
-nd=1800; %2-D neural density in V1 by cell/mm^2 (Jaeson Jang, Min Song, Se-Bum Paik, 2020)
-mf=5; %cortical magnification factor degree/mm (Gilbert CD and Wiesel 1989)
-lcScale=0.55; %a reference scale factor of lateral connection by mm (Fuyuki Karube and Zoltan F. Kisvarday, 2010)
-refAct=35;
+% rf=3; %receptive field size by degree (Gilbert CD and Wiesel 1989, Fuyuki Karube and Zoltan F. Kisvarday, 2010)
+% nd=1800; %2-D neural density in V1 by cell/mm^2 (Jaeson Jang, Min Song, Se-Bum Paik, 2020)
+% mf=5; %cortical magnification factor degree/mm (Gilbert CD and Wiesel 1989)
+% lcScale=0.55; %a reference scale factor of lateral connection by mm (Fuyuki Karube and Zoltan F. Kisvarday, 2010)
+% refAct=35;
 % %Tree Shrew
 
 % rf=3; %receptive field size by degree (Francois Mooser et.al 2004)
@@ -23,11 +23,11 @@ refAct=35;
 %refAct=20;
 %Mouse
 
-rf=10; %receptive field size by degree (Jiakun Fu et.al, 2024)
-nd=2200; %2-D neural density in V1 by cell/mm^2 (Jaeson Jang, Min Song, Se-Bum Paik, 2020)
-mf=120; %cortical magnification factor degree/mm (Jaeson Jang, Min Song, Se-Bum Paik, 2020)
-lcScale=0.03; %a reference scale factor of lateral connection by mm (Peijia Yu et.al. 2025)
-refAct=10;
+% rf=10; %receptive field size by degree (Jiakun Fu et.al, 2024)
+% nd=2200; %2-D neural density in V1 by cell/mm^2 (Jaeson Jang, Min Song, Se-Bum Paik, 2020)
+% mf=120; %cortical magnification factor degree/mm (Jaeson Jang, Min Song, Se-Bum Paik, 2020)
+% lcScale=0.03; %a reference scale factor of lateral connection by mm (Peijia Yu et.al. 2025)
+% refAct=10;
 %% Parameters
 
 n=64; %128*128 cells, number of cells in this patch of V1 cortex
