@@ -115,15 +115,7 @@ end
 %% 计算前馈刺激
 
 function IList=input(rfRad,lcRad,nCells,mPixels,simFreq,imgList,map)
-% [X, Y]=meshgrid(1:256);
-% SX=sin(X/2)*100;
-% SY=sin(Y/2)*100;
-%
-% temImg=ones(256)*30;
-% I=buildInput(SY,map,lambda,nCells);
 
-% randseed=randn(nCells);
-% randseed=randseed./abs(randseed);
 
 noiseLevel=mean(abs(imgList),'all')/5;
 
