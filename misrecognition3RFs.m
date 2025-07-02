@@ -7,6 +7,7 @@ function misRec=misrecognition3RFs(sample,sigmaRFs,sigmaNoise,pos)
     %pos:ground truth we are interested in, position in [0,1]
     
     t=0.25;
+    responseMax=(1/(sigmaRFs*sqrt(2*pi)))+(2*sigmaNoise);
     pos=round(pos*sample);
     
     [I,J,K]=meshgrid(1:sample,1:sample,1:sample);
@@ -17,7 +18,7 @@ function misRec=misrecognition3RFs(sample,sigmaRFs,sigmaNoise,pos)
     coreA=permute(coreA,[2,1,3,4]);
     
     
-    A=repmat(reshape(coreA, [1, sample, sample, sample,3]), [sample, 1, 1, 1, 1]);
+    A=repmat(reshape(coreA, [1, sample, sample, sample,3]), [sample, 1, 1, 1, 1])*responseMax;
     %A: the tensor that records coordinates in neural space
     
     
