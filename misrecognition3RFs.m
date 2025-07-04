@@ -1,12 +1,15 @@
-function misRec=misrecognition3RFs(sample,sigmaRFs,sigmaNoise,pos)
+function misRec=misrecognition3RFs(sample,sigmaRFs,noiseLevel,pos)
 
     %Input:
     %sample:number of sample points taken in [0,1]
     %sigmaRFs:SD of the tuning curve of RFs
-    %sigmaNoise:SD of noise
+    %noiseLevel:a value in [0,1] arranging the noise intensity, (SD of noise)/(max of the tuning curve/2)
     %pos:ground truth we are interested in, position in [0,1]
     
+    
+    
     t=0.25;
+    sigmaNoise=(noiseLevel/2)*(1/(sigmaRFs*sqrt(2*pi)));
     responseMax=(1/(sigmaRFs*sqrt(2*pi)))+(2*sigmaNoise);
     pos=round(pos*sample);
     
@@ -23,7 +26,7 @@ function misRec=misrecognition3RFs(sample,sigmaRFs,sigmaNoise,pos)
     
     
     aVec=(1/sample:1/sample:1)';
-    B_base=[aVec,aVec+t,aVec+2*t]; 
+    B_base=[aVec-t,aVec-2*t,aVec-3*t]; 
     
     
     B=repmat(B_base,[1,1,sample,sample,sample]); 
@@ -47,6 +50,6 @@ function misRec=misrecognition3RFs(sample,sigmaRFs,sigmaNoise,pos)
     misRec=pdfPosExt.*pdf3RFs;
     misRec=sum(misRec,[2,3,4]);
     misRec=(misRec*sample)/sum(misRec,"all");
-    xcod=linspace(1/sample,1,sample);
-    figure,plot(xcod,misRec);
+    %xcoord=linspace(1/sample,1,sample);
+    %figure,plot(xcoord,misRec);
 end
