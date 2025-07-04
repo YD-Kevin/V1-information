@@ -1,0 +1,43 @@
+function [meanValue,sdValue,cvValue]=compute1DCV(r,n,pos)
+
+
+
+xPoints=linspace(-1,1,n+2);
+xPoints=xPoints(2:end-1);
+xPoints=xPoints+pos*xPoints(1);
+
+
+response=normpdf(xPoints,0,r);
+
+
+meanValue=mean(response);
+varValue=var(response);
+sdValue=sqrt(varValue);
+cvValue=sdValue/meanValue;
+
+
+figure('Color','white');
+hold on;
+
+
+xRange=linspace(-1,1,500);
+pdfValues=(1/(r*sqrt(2*pi)))*exp(-xRange.^2/(2*r^2));
+plot(xRange,pdfValues,'b-','LineWidth',1.5);
+
+
+for i=1:n
+    plot([xPoints(i),xPoints(i)],[0,response(i)],'k:','LineWidth',3);
+    plot(xPoints(i),response(i),'ro','MarkerFaceColor','r','MarkerSize',6);
+end
+
+
+xlim([-1,1]);
+title(sprintf('1D-Normal (\\sigma=%.2f, n=%d)',r,n));
+xlabel('x');
+ylabel('pdf');
+grid on;
+box on;
+
+
+text(0.8*max(xlim),0.8*max(ylim),sprintf('Mean: %.4f\n SD: %.4f\n CV: %.4f',meanValue,sdValue,cvValue));
+end
