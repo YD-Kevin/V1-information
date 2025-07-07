@@ -1,0 +1,10 @@
+n=10; %number of RFs
+sample=100; %number of sampling points
+sigmaRFs=0.12; %size of RFs
+noiseLevel=0.1; %intensity of noise
+pos=0.5; %position
+
+misRec=misrecognitionNRFs(n,sample,sigmaRFs,noiseLevel,pos);
+xcoord=linspace(1/sample,1,sample);
+
+figure,plot(xcoord,misRec);
