@@ -3,7 +3,7 @@ sigmaRFs=0.12;
 noiseLevel=0.1;
 pos=0.5;
 
-misrecognition3RFs(sample,sigmaRFs,noiseLevel,pos);
+misRec=misrecognition3RFs(sample,sigmaRFs,noiseLevel,pos);
 xcoord=linspace(1/sample,1,sample);
 
 figure,plot(xcoord,misRec);
