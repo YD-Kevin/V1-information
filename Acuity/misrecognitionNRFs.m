@@ -19,6 +19,6 @@ misRec=sample*misRec./(sum(misRec,"all"));
     function responses=posToResponses(pos,n,sigmaRFs)
         gap=1/(n+1);
         peaks=linspace(gap,1-gap,n);
-        responses=normpdf(pos,peaks,sigmaRFs)+3;
+        responses=normpdf(pos,peaks,sigmaRFs);
     end
 end
