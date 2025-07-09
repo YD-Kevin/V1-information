@@ -37,17 +37,17 @@ edges=linspace(0,1,refPointsNumber);
 misRecogSample=misRecogSample/refPointsNumber;
 figure,histogram(misRecogSample,edges);
 
-function idx = weightedRandomSelection(weights)
+function idx=weightedRandomSelection(weights)
 
-cumWeights = cumsum(weights);
-
-
-totalWeight = cumWeights(end);
-r = rand() * totalWeight;
-
-idx = find(cumWeights >= r, 1, 'first');
-
-if isempty(idx)
-    idx = randi(length(weights)); 
-end
+    cumWeights=cumsum(weights);
+    
+    
+    totalWeight=cumWeights(end);
+    r=rand()*totalWeight;
+    
+    idx=find(cumWeights >= r, 1, 'first');
+    
+    if isempty(idx)
+        idx=randi(length(weights)); 
+    end
 end
