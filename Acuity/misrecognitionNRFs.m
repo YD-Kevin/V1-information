@@ -11,9 +11,10 @@ end
 
 extGTresponses=repmat(reshape(GTresponses, [1, n]), [sample,1]);
 
-distance=sum((sampleResponses-extGTresponses).^2,[2]);
+distanceSQ=sum((sampleResponses-extGTresponses).^2,[2]);
 
-misRec=1./exp((distance.^2)/(sigmaNoise^2));
+misRec=(0.5*exp(-distanceSQ/(8*sigmaNoise^2)))./(1-0.5*exp(-distanceSQ/(8*sigmaNoise^2)));
+
 misRec=sample*misRec./(sum(misRec,"all"));
 
     function responses=posToResponses(pos,n,sigmaRFs)
