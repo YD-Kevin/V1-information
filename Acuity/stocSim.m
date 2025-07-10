@@ -21,8 +21,8 @@ function misRecogSample=stocSim(n,grid,sample,sigmaRFs,noiseLevel,pos)
     exRefPoints=repmat(reshape(refResponses, [grid, 1, n]), [1,sample,1]);
     
     dis=exPoints-exRefPoints;
-     dis=squeeze(sum(dis.^2,[3]));
-     dis=normpdf(dis,0,sigmaNoise);
+    dis=squeeze(sum(dis.^2,[3]));
+    dis=normpdf(dis,0,sigmaNoise);
     misRecogSample=zeros(sample,1);
     for i=1:sample
         misRecogSample(i)=weightedRandomSelection(squeeze(dis(:,i)));
@@ -33,17 +33,16 @@ function misRecogSample=stocSim(n,grid,sample,sigmaRFs,noiseLevel,pos)
     % figure,histogram(misRecogSample,edges);
     
     function idx = weightedRandomSelection(weights)
-    
+
         cumWeights = cumsum(weights);
-        
         
         totalWeight = cumWeights(end);
         r = rand() * totalWeight;
         
         idx = find(cumWeights >= r, 1, 'first');
-        
-        if isempty(idx)
-            idx = randi(length(weights)); 
+
+        if(norm(weights)==0)
+            idx=randi(length(weights)); 
         end
     end
 end
