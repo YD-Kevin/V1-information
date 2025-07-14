@@ -17,7 +17,7 @@ function misRec=misrecognitionNRFs2D(n,m,sample,sigmaRFsX,sigmaRFsY,rho,noiseLev
     
     misRec=(0.5*exp(-distanceSQ/(8*sigmaNoise^2)))./(1-0.5*exp(-distanceSQ/(8*sigmaNoise^2)));
     
-    misRec=sample*misRec./(sum(misRec,"all"));
+    misRec=(sample^2)*misRec./(sum(misRec,"all"));
     
         function responses=posToResponses(posX,posY,n,m,sigmaRFsX,sigmaRFsY,rho)
             gapX=1/(n+1);
