@@ -5,7 +5,7 @@ posGrid=5;
 count=0;
 grid=100;
 sample=600;
-sigmaRFList=linspace(0,0.6,sizeGrid);
+sigmaRFList=linspace(0.01,0.6,sizeGrid);
 
 simDisExpAlbum=zeros(nGrid,sizeGrid,noiseGrid,posGrid,posGrid);
 
