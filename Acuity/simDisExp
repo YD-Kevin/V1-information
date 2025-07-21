@@ -1,0 +1,34 @@
+nGrid=8;
+sizeGrid=15;
+noiseGrid=4;
+posGrid=5;
+count=0;
+grid=100;
+sample=600;
+sigmaRFList=linspace(0,0.6,sizeGrid);
+
+simDisExpAlbum=zeros(nGrid,sizeGrid,noiseGrid,posGrid,posGrid);
+
+posListX=rand(1,posGrid);
+posListY=rand(1,posGrid);
+
+X=repmat(reshape(linspace(0,1,grid), [1, 1, grid, 1]), [posGrid,posGrid,1,grid]);
+Y=repmat(reshape(linspace(0,1,grid), [1, 1, 1, grid]), [posGrid,posGrid,grid,1]);
+extPosX=repmat(reshape(posListX, [posGrid, 1, 1, 1]), [1,posGrid,grid,grid]);
+extPosY=repmat(reshape(posListY, [1, posGrid, 1, 1]), [posGrid,1,grid,grid]);
+disPos=sqrt((X-extPosX).^2+(Y-extPosY).^2);
+
+for i=1:nGrid
+
+    gap=1/(i+1);
+    for j=1:sizeGrid
+         for k=1:noiseGrid
+
+                    simResult=stocSim2DFast(i,i,grid,sample,sigmaRFList(j),sigmaRFList(j),0.1*(2^(k-1)),posListX,posListY,posGrid);
+                    simDisExp=sum(disPos.*simResult,[3,4]);
+                    simDisExpAlbum(i,j,k,:,:)=simDisExp;
+         end
+         count=((i-1)*15+j)/120
+     end
+
+ end
